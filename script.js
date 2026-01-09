@@ -10,6 +10,7 @@ let food = randomFood();
 let score = 0;
 let highScore = 0;
 let speed = 120;
+let isPaused = true; // game mulai pause
 
 function randomFood() {
     return {
@@ -21,23 +22,13 @@ function randomFood() {
 function drawSnake() {
     snake.forEach((seg, i) => {
         ctx.fillStyle = i === 0 ? '#ff4081' : '#aff';
-        ctx.fillRect(
-            seg.x * gridSize,
-            seg.y * gridSize,
-            gridSize,
-            gridSize
-        );
+        ctx.fillRect(seg.x * gridSize, seg.y * gridSize, gridSize, gridSize);
     });
 }
 
 function drawFood() {
     ctx.fillStyle = '#fff';
-    ctx.fillRect(
-        food.x * gridSize,
-        food.y * gridSize,
-        gridSize,
-        gridSize
-    );
+    ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize, gridSize);
 }
 
 function moveSnake() {
@@ -82,6 +73,13 @@ function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawSnake();
     drawFood();
+
+    if (isPaused) {
+        ctx.fillStyle = 'rgba(255,255,255,0.8)';
+        ctx.font = '30px Times New Roman';
+        ctx.textAlign = 'center';
+        ctx.fillText('PAUSED', canvas.width / 2, canvas.height / 2);
+    }
 }
 
 function resetGame() {
@@ -90,16 +88,31 @@ function resetGame() {
     direction = 'right';
     score = 0;
     food = randomFood();
+    isPaused = true;
     updateScore();
 }
 
 function gameLoop() {
-    moveSnake();
+    if (!isPaused) {
+        moveSnake();
+    }
     draw();
     setTimeout(gameLoop, speed);
 }
 
+document.getElementById('playBtn').addEventListener('click', () => {
+    isPaused = false;
+});
+
+document.getElementById('pauseBtn').addEventListener('click', () => {
+    isPaused = true;
+});
+
 document.addEventListener('keydown', e => {
+    if (e.code === 'Space') {
+        isPaused = !isPaused;
+    }
+
     if (e.key === 'ArrowUp' && direction !== 'down') direction = 'up';
     if (e.key === 'ArrowDown' && direction !== 'up') direction = 'down';
     if (e.key === 'ArrowLeft' && direction !== 'right') direction = 'left';
